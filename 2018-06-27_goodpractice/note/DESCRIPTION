@@ -1,0 +1,17 @@
+Package: note
+Version: 0.0.0.9000
+Title: Play Music in R
+Description: What the package does (one paragraph).
+Authors@R: c(person("Jim", "Hester", email = "james.f.hester@gmail.com", role = c("aut", "cre")),
+             person("Hannah", "Frick", role = "ctb"))
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+ByteCompile: true
+RoxygenNote: 6.0.1
+Imports: 
+    audio
+Suggests: 
+    testthat
+URL: http://www.github.com/me/note
+BugReports: http://www.github.com/me/note/issues
