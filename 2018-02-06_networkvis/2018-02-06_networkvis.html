@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Network Visualisation with ggraph</title>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="networks_files/rmdshower/node_modules/shower-mango/styles/screen-4x3.css">
+  <link rel="stylesheet" href="networks_files/rmdshower.mango/package/styles/screen-4x3.css">
+  <link rel="stylesheet" href="networks_files/rmdshower/style-common.css">
+  <link rel="stylesheet" href="networks_files/rmdshower/style-mango.css">
+  <link rel="stylesheet" href="networks_files/rmdshower.mango/style-override.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+  <script src="networks_files/rmdshower/auto-render.min.js" type="text/javascript"></script>
+  
+  
+    <style type="text/css">
+   div.sourceCode { overflow-x: auto; }
+   table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+     margin: 0; padding: 0; vertical-align: baseline; border: none; }
+   table.sourceCode { width: 100%; line-height: 100%; }
+   td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+   td.sourceCode { padding-left: 5px; }
+   code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+   code > span.dt { color: #902000; } /* DataType */
+   code > span.dv { color: #40a070; } /* DecVal */
+   code > span.bn { color: #40a070; } /* BaseN */
+   code > span.fl { color: #40a070; } /* Float */
+   code > span.ch { color: #4070a0; } /* Char */
+   code > span.st { color: #4070a0; } /* String */
+   code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+   code > span.ot { color: #007020; } /* Other */
+   code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+   code > span.fu { color: #06287e; } /* Function */
+   code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+   code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+   code > span.cn { color: #880000; } /* Constant */
+   code > span.sc { color: #4070a0; } /* SpecialChar */
+   code > span.vs { color: #4070a0; } /* VerbatimString */
+   code > span.ss { color: #bb6688; } /* SpecialString */
+   code > span.im { } /* Import */
+   code > span.va { color: #19177c; } /* Variable */
+   code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+   code > span.op { color: #666666; } /* Operator */
+   code > span.bu { } /* BuiltIn */
+   code > span.ex { } /* Extension */
+   code > span.pp { color: #bc7a00; } /* Preprocessor */
+   code > span.at { color: #7d9029; } /* Attribute */
+   code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+   code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+   code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+   code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  
+  
+  
+</head>
+
+<body class="shower list">
+
+  <header class="caption">
+    <h1>Network Visualisation with ggraph</h1>
+    <p>Hannah Frick</p>
+  </header>
+
+    <section class="slide level1 titlepage">
+    <h1>Network Visualisation with ggraph</h1>
+    <h2>Hannah Frick <br> <span class="citation" data-cites="hfcfrick">@hfcfrick</span></h2>
+  </section>
+    
+  
+<section id="outline-for-the-tutorial" class="slide level2">
+<h2>Outline for the Tutorial</h2>
+<ul>
+<li>Representation of networks with <strong>igraph</strong></li>
+<li>Visualisation with <strong>ggraph</strong>
+<ul>
+<li>layers</li>
+<li>nodes</li>
+<li>edges</li>
+</ul></li>
+</ul>
+<p>Based on <!-- Doug Ashton's networks workshop [[material](https://github.com/dougmet/NetworksWorkshop)] --> Thomas Lin Pedersen’s <a href="https://www.data-imaginist.com/tags/ggraph/">series of blog posts</a> on <strong>ggraph</strong></p>
+</section>
+<section id="about-me" class="slide level2">
+<h2>About me</h2>
+<ul>
+<li>Statistician by training</li>
+<li>Author of <strong>psychomix</strong> and <strong>trackeR</strong> packages</li>
+<li>A Mango cat since ~ mid 2017</li>
+<li>R-Ladies: co-organiser for London chapter and part of the global Leadership Team</li>
+<li>Github: <a href="https://www.github.com/hfrick"><code>hfrick</code></a></li>
+<li>Twitter: <a href="https://www.twitter.com/hfcfrick"><code>@hfcfrick</code></a></li>
+</ul>
+</section>
+<section id="networks-are-everywhere" class="slide level2">
+<h2>Networks are everywhere</h2>
+<center>
+<img src="images/nets.jpg" height="495px">
+</center>
+<!-- ################################################################
+     ##                 Representing Networks                      ##
+     ################################################################ -->
+</section>
+<section id="representing-networks" class="slide level2">
+<h2>Representing Networks</h2>
+</section>
+<section id="terminology" class="slide level2">
+<h2>Terminology</h2>
+<div style="float:left; width:40%">
+<h3 id="nodes-and-edges">Nodes and edges</h3>
+<p><img src="images/nodes_edges.png" width = "400px"></p>
+</div>
+<div style="float:left; width:40%; margin-left:110px">
+<h3 id="directed">Directed</h3>
+<p><img src="images/directed.png" width = "400px"></p>
+</div>
+</section>
+<section id="matrix-representation" class="slide level2">
+<h2>Matrix Representation</h2>
+<p>Code whether each possible edge exists or not.</p>
+<p><span class="math display">\[
+A_{ij} = \begin{cases} 0, &amp; \text{no edge} \\ 1, &amp; \text{edge exists} \end{cases}
+\]</span> For example</p>
+<p><span class="math display">\[
+A=\left( \begin{array}{cccc} 0 &amp; 0 &amp; 1 &amp; 1 \\ 1 &amp; 0 &amp; 0 &amp; 0 \\ 
+            0 &amp; 0 &amp; 0 &amp; 1 \\ 0 &amp; 1 &amp; 0 &amp; 0 \end{array} \right)
+\]</span></p>
+</section>
+<section id="matrix-representation-in-r" class="slide level2">
+<h2>Matrix Representation in R</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(igraph)
+A &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>), <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>))
+g &lt;-<span class="st"> </span><span class="kw">graph_from_adjacency_matrix</span>(A)
+<span class="kw">plot</span>(g)</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-1-1.png" width="768" height="370" style="display: block; margin: auto;" /></p>
+</section>
+<section id="edge-list-representation" class="slide level2">
+<h2>Edge List Representation</h2>
+<p>It is much more compact to just list the edges. We can use a two-column matrix</p>
+<p><span class="math display">\[
+E=\left[ \begin{array}{cc} A &amp; B \\ B &amp; A \\ B &amp; C \\ C &amp; A \end{array} \right]
+\]</span></p>
+</section>
+<section id="edge-list-in-r" class="slide level2">
+<h2>Edge List in R</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">el &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;B&quot;</span>), <span class="kw">c</span>(<span class="st">&quot;B&quot;</span>,<span class="st">&quot;A&quot;</span>), <span class="kw">c</span>(<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>), <span class="kw">c</span>(<span class="st">&quot;C&quot;</span>,<span class="st">&quot;A&quot;</span>))
+g &lt;-<span class="st"> </span><span class="kw">graph_from_edgelist</span>(el)
+<span class="kw">plot</span>(g)</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-2-1.png" width="768" height="370" style="display: block; margin: auto;" /></p>
+</section>
+<section id="creating-igraph-objects" class="slide level2">
+<h2>Creating <strong>igraph</strong> Objects</h2>
+<p>From an adjacency matrix or edge list</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">g &lt;-<span class="st"> </span><span class="kw">graph_from_adjacency_matrix</span>(A)
+g &lt;-<span class="st"> </span><span class="kw">graph_from_edgelist</span>(el)</code></pre></div>
+<p>From a textual description</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">g &lt;-<span class="st"> </span><span class="kw">graph_from_literal</span>(A<span class="op">--</span>B, B<span class="op">-+</span>C, C<span class="op">-+</span>A)</code></pre></div>
+<p>From a data frame</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(el)
+g &lt;-<span class="st"> </span><span class="kw">graph_from_data_frame</span>(df)</code></pre></div>
+</section>
+<section id="converting-back" class="slide level2">
+<h2>Converting back</h2>
+<p>From a graph object we can output just as we read in:</p>
+<div style="float:left; width:40%">
+<h3 id="adjacency-matrix">Adjacency Matrix</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">A &lt;-<span class="st"> </span><span class="kw">as_adjacency_matrix</span>(g, 
+  <span class="dt">sparse =</span> <span class="ot">FALSE</span>)
+A</code></pre></div>
+<pre><code>##   A B C
+## A 0 1 0
+## B 1 0 1
+## C 1 0 0</code></pre>
+</div>
+<div style="float:left; width:40%; margin-left:110px">
+<h3 id="edge-list">Edge List</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">el &lt;-<span class="st"> </span><span class="kw">as_edgelist</span>(g)
+el</code></pre></div>
+<pre><code>##      [,1] [,2]
+## [1,] &quot;A&quot;  &quot;B&quot; 
+## [2,] &quot;B&quot;  &quot;A&quot; 
+## [3,] &quot;B&quot;  &quot;C&quot; 
+## [4,] &quot;C&quot;  &quot;A&quot;</code></pre>
+</div>
+<!-- ################################################################
+     ##                 Standard Structures                        ##
+     ################################################################ -->
+<!--
+## Standard Structures
+
+## Standard Structures
+
+**igraph** has a family of functions `make_` to generate graphs of a standard structure:
+
+- `tree`: several central nodes
+- `full_graph` / clique: everyone connected to everyone
+- `lattice`: regular grid
+- `star`: one central node
+
+## Trees
+
+
+```r
+g <- make_tree(27, children = 3)
+plot(g)
+```
+
+<img src="networks_files/figure-revealjs/unnamed-chunk-8-1.png" width="768" height="400" />
+
+## Complete Graphs
+
+
+```r
+g <- make_full_graph(n = 6)
+plot(g)
+```
+
+<img src="networks_files/figure-revealjs/unnamed-chunk-9-1.png" width="768" height="400" />
+
+## Lattices
+
+
+```r
+g <- make_lattice(dimvector = c(5,5), circular = FALSE)
+plot(g)
+```
+
+<img src="networks_files/figure-revealjs/unnamed-chunk-10-1.png" width="768" height="400" />
+
+## Stars
+
+
+```r
+g <- make_star(n = 10, mode = "undirected")
+plot(g)
+```
+
+<img src="networks_files/figure-revealjs/unnamed-chunk-11-1.png" width="768" height="400" />
+-->
+<!--
+## Exercise
+
+- Create a star network with 5 nodes
+- Convert the network to an adjacency matrix
+-->
+<!-- ################################################################
+     ##              Import and Export                             ##
+     ################################################################ -->
+</section>
+<section id="importexport" class="slide level2">
+<h2>Import/Export</h2>
+</section>
+<section id="networks-from-data-frames" class="slide level2">
+<h2>Networks from Data Frames</h2>
+<p>Usually we’ll read in edge lists as <code>data.frame</code> objects. The csv file <code>dolphin_edges.csv</code> contains the edge list of the undirected social network of 62 dolphins in a community living off Doubtful Sound, New Zealand (Lusseau et al, 2003).</p>
+<!--
+<small>*Data from: D. Lusseau, K. Schneider, O. J. Boisseau, P. Haase, E. Slooten, and S. M. Dawson, Behavioral Ecology and Sociobiology 54, 396-405 (2003)</small>
+-->
+</section>
+<section id="networks-from-data-frames-1" class="slide level2">
+<h2>Networks from Data Frames</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dolphinEdges &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/dolphin_edges.csv&quot;</span>)
+<span class="kw">head</span>(dolphinEdges, <span class="dt">n =</span> <span class="dv">4</span>)</code></pre></div>
+<pre><code>##   From      To
+## 1  CCL  Double
+## 2 DN16 Feather
+## 3 DN21 Feather
+## 4 Beak    Fish</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dolphin &lt;-<span class="st"> </span><span class="kw">graph_from_data_frame</span>(dolphinEdges, <span class="dt">directed =</span> <span class="ot">TRUE</span>)</code></pre></div>
+</section>
+<section id="node-lists" class="slide level2">
+<h2>Node Lists</h2>
+<p>It is also possible to load information about the nodes at the same time.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dolphinVertices &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/dolphin_vertices.csv&quot;</span>)
+<span class="kw">head</span>(dolphinVertices, <span class="dt">n =</span> <span class="dv">4</span>)</code></pre></div>
+<pre><code>##         Name Gender
+## 1       Beak   Male
+## 2 Beescratch   Male
+## 3     Bumper   Male
+## 4        CCL Female</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dolphin &lt;-<span class="st"> </span><span class="kw">graph_from_data_frame</span>(dolphinEdges, <span class="dt">directed =</span> <span class="ot">TRUE</span>,
+                                 <span class="dt">vertices =</span> dolphinVertices)</code></pre></div>
+<!-- 
+Note: It's important that the first column of the vertex data frame is the names and they match the edge list perfectly.
+-->
+</section>
+<section id="exporting-to-a-data-frame" class="slide level2">
+<h2>Exporting to a Data Frame</h2>
+<p>To export an igraph object back to a data.frame we use the <code>as_data_frame</code> function. This function can output the edge list, the node list or both depending on the <code>what</code> argument.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dolphinDFs &lt;-<span class="st"> </span><span class="kw">as_data_frame</span>(dolphin, <span class="dt">what =</span> <span class="st">&quot;both&quot;</span>)
+<span class="kw">str</span>(dolphinDFs) <span class="co"># Both data frames in a list</span></code></pre></div>
+<pre><code>## List of 2
+##  $ vertices:&#39;data.frame&#39;:    62 obs. of  2 variables:
+##   ..$ name  : chr [1:62] &quot;Beak&quot; &quot;Beescratch&quot; &quot;Bumper&quot; &quot;CCL&quot; ...
+##   ..$ Gender: chr [1:62] &quot;Male&quot; &quot;Male&quot; &quot;Male&quot; &quot;Female&quot; ...
+##  $ edges   :&#39;data.frame&#39;:    159 obs. of  2 variables:
+##   ..$ from: chr [1:159] &quot;CCL&quot; &quot;DN16&quot; &quot;DN21&quot; &quot;Beak&quot; ...
+##   ..$ to  : chr [1:159] &quot;Double&quot; &quot;Feather&quot; &quot;Feather&quot; &quot;Fish&quot; ...</code></pre>
+</section>
+<section id="other-formats" class="slide level2">
+<h2>Other Formats</h2>
+<p><code>igraph</code> allows import and export from a number of common formats. This is done using the <code>read_graph</code> and <code>write_graph</code> functions. A common open format is <code>graphml</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">write_graph</span>(dolphin, <span class="st">&quot;dolphin.graphml&quot;</span>, <span class="dt">format =</span> <span class="st">&quot;graphml&quot;</span>)</code></pre></div>
+</section>
+<section id="other-formats-1" class="slide level2">
+<h2>Other Formats</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Format</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>edgelist</code></td>
+<td>A simple text file with one edge per line</td>
+</tr>
+<tr class="even">
+<td><code>pajek</code></td>
+<td>Pajek is a popular Windows program for network analysis</td>
+</tr>
+<tr class="odd">
+<td><code>gml</code></td>
+<td>Graph Modelling Language is a common text based open format</td>
+</tr>
+<tr class="even">
+<td><code>graphml</code></td>
+<td>Graph Markup Language is an XML based open format</td>
+</tr>
+<tr class="odd">
+<td><code>dot</code></td>
+<td>Format used by GraphViz</td>
+</tr>
+</tbody>
+</table>
+<!--
+<b>Gephi:</b> To export to Gephi's native GEXF format use the `rgexf` package, available on CRAN, which
+can convert directly from an igraph object.
+-->
+<!--
+## Exercise - Importing from csv
+
+1. Load the dolphin data set into `igraph`. Remember
+that the data is for an undirected network.
+-->
+<!-- ################################################################
+     ##                 Network Manipulation                       ##
+     ################################################################ -->
+<!-- - Attributes
+     - Edge/Vertex selectors
+     - Subgraphs
+     - Adding/Deleting
+
+     Don't cover contracting and merging.
+
+     45 mins -->
+<!--
+## Network Manipulation
+
+## Attributes
+
+All objects in `igraph`, vertices and edges, can have attributes. Even the graph itself:
+
+
+```r
+library(igraphdata)
+data("USairports")
+graph_attr(USairports)
+```
+
+```
+## $name
+## [1] "US airports"
+```
+
+Some have a special meaning, such as `name`, `weight` (for edges) and `type` (bi-partite graphs).
+
+## Vertex Attributes
+
+We can use the `_attr` functions to access attributes
+
+
+```r
+vertex_attr_names(USairports)
+```
+
+```
+## [1] "name"     "City"     "Position"
+```
+
+```r
+vertex_attr(USairports, "City")[1:5]
+```
+
+```
+## [1] "Bangor, ME"    "Boston, MA"    "Anchorage, AK" "New York, NY" 
+## [5] "Las Vegas, NV"
+```
+
+
+## Edge Attributes
+
+
+```r
+edge_attr_names(USairports)
+```
+
+```
+## [1] "Carrier"    "Departures" "Seats"      "Passengers" "Aircraft"  
+## [6] "Distance"
+```
+
+```r
+edge_attr(USairports, "Carrier")[1:5]
+```
+
+```
+## [1] "British Airways Plc" "British Airways Plc" "British Airways Plc"
+## [4] "China Airlines Ltd." "China Airlines Ltd."
+```
+
+The `weight` attribute is treated in a special way for edges and can affect the result of some calculations, such as path lengths and centrality measures.
+
+## Sequences
+
+The sequence functions: `V()` for vertices and `E()` for edges, allow selections and access to attributes. They return special `igraph.vs` and `igraph.es` objects that can be reused.
+
+
+```r
+V(USairports)[1:5] # Subset by index
+```
+
+```
+## + 5/755 vertices, named, from bf6202d:
+## [1] BGR BOS ANC JFK LAS
+```
+
+```r
+V(USairports)["JFK"] # Subset by name
+```
+
+```
+## + 1/755 vertex, named, from bf6202d:
+## [1] JFK
+```
+
+
+## Adding Attributes
+
+The dollar notation allows us to manipulate attributes much like a `data.frame`.
+
+
+```r
+V(USairports)[1:5]$City # Access attributes
+```
+
+```
+## [1] "Bangor, ME"    "Boston, MA"    "Anchorage, AK" "New York, NY" 
+## [5] "Las Vegas, NV"
+```
+
+```r
+# Add new attributes
+V(USairports)$Group <- sample(c("A","B"), vcount(USairports), replace=TRUE)
+V(USairports)[[1:5]] # Double square brackets give all attributes
+```
+
+```
+## + 5/755 vertices, named, from bf6202d:
+##   name          City         Position Group
+## 1  BGR    Bangor, ME N444827 W0684941     A
+## 2  BOS    Boston, MA N422152 W0710019     B
+## 3  ANC Anchorage, AK N611028 W1495947     A
+## 4  JFK  New York, NY N403823 W0734644     A
+## 5  LAS Las Vegas, NV N360449 W1150908     A
+```
+
+
+## Edge Selectors
+
+We can also access edges between named vertices using the special `%--%` (undirected) and
+`%->%` (directed) operators.
+
+
+
+```r
+E(USairports)["JFK" %--% "BOS"] # Edges in both directions
+```
+
+```
+## + 26/23473 edges from bf6202d (vertex names):
+##  [1] BOS->JFK BOS->JFK JFK->BOS JFK->BOS BOS->JFK JFK->BOS BOS->JFK
+##  [8] JFK->BOS BOS->JFK BOS->JFK BOS->JFK BOS->JFK BOS->JFK JFK->BOS
+## [15] JFK->BOS JFK->BOS JFK->BOS BOS->JFK JFK->BOS BOS->JFK BOS->JFK
+## [22] JFK->BOS JFK->BOS BOS->JFK JFK->BOS BOS->JFK
+```
+
+## Edge Selectors
+
+All carriers from JFK to BOS.
+
+
+```r
+ unique(E(USairports)["JFK" %->% "BOS"]$Carrier) # Directed edges
+```
+
+```
+## [1] "JetBlue Airways"              "Compass Airlines"            
+## [3] "Pinnacle Airlines Inc."       "Comair Inc."                 
+## [5] "Atlantic Southeast Airlines"  "American Eagle Airlines Inc."
+## [7] "Chautauqua Airlines Inc."
+```
+
+
+
+## Edges Between Groups
+
+The edge selectors can be between groups of vertices:
+
+
+
+```r
+# Grep the state code from the city
+inCal <- grepl("CA$", V(USairports)$City)
+inNy <- grepl("NY$", V(USairports)$City)
+
+# Edges from CA to NY
+E(USairports)[V(USairports)[inCal] %->% V(USairports)[inNy]]
+```
+
+```
+## + 35/23473 edges from bf6202d (vertex names):
+##  [1] LAX->JFK LAX->JFK LAX->JFK LAX->JFK SAN->JFK SFO->JFK SFO->JFK
+##  [8] SFO->JFK BUR->JFK LAX->JFK LGB->JFK OAK->JFK SAN->JFK SFO->JFK
+## [15] SJC->JFK SMF->JFK LAX->JFK LAX->JFK LAX->JFK SAN->JFK SAN->JFK
+## [22] SFO->JFK SFO->JFK SNA->JFK LAX->ALB LAX->JFK LAX->JFK SFO->JFK
+## [29] SFO->JFK SFO->JFK BUR->FRG LAX->JFK LAX->JFK SFO->JFK SFO->JFK
+```
+
+Returns all flights from California to New York (state).
+
+## Exercise - Attributes
+
+1. Using the igraph object created in the previous exercise, count the number of male and female dolphins in the pod.
+2. Add a weight=1 attribute to every edge in the dolphin network. Verify that the igraph object is now a weighted network.
+
+## Induced subgraph
+To get a new graph containing the selected vertices we must also copy over all of the edges
+between those vertices. This is done by the `induced_subgraph()` function
+
+
+
+```r
+# inCal has the vertex ids we want
+calAirports <- induced_subgraph(USairports, inCal)
+calAirports
+```
+<!-- manual output to be able to shorten it -->
+<!-- 
+```
+## IGRAPH f96900b DN-- 34 381 -- US airports
+## + attr: name (g/c), name (v/c), City (v/c), Position (v/c), Group
+## | (v/c), Carrier (e/c), Departures (e/n), Seats (e/n), Passengers
+## | (e/n), Aircraft (e/n), Distance (e/n)
+## + edges from f96900b (vertex names):
+##  [1] LAX->SFO LAX->SFO LAX->SFO LAX->SFO LAX->SFO LAX->SFO LAX->SFO
+##  [8] LAX->SFO LAX->SFO LAX->SFO LAX->SFO LAX->SFO LAX->SFO LAX->SFO
+## + ... omitted several edges
+```
+
+The `subgraph.edges()` function does the same thing but selecting edges to keep (and their attached vertices).
+
+
+## Neighbourhoods
+
+A common task is to subset all of the neighbours of a particular vertex. To return all neigh-
+bours within a distance, d, of a number of targets we can do
+
+
+```r
+d2Vertices <- ego(USairports, nodes = c("JFK","LAX"), order=2)
+```
+
+which returns a list containing the vertices within 2 of JFK and LAX. If we want the neighbourhood of a vertex as a new graph we can do
+
+
+```r
+JFKNet <- make_ego_graph(USairports, nodes = "JFK", order=2)[[1]]
+# Returns a length 1 list
+```
+
+
+## Adding
+
+The `edges` and `vertices` functions can be used to add edges
+
+
+
+```r
+# A directed completely empty graph
+g <- make_empty_graph(n = 0, directed = TRUE)
+
+g <- g + vertices(c("A","B","C"))
+```
+
+And edges
+
+
+
+```r
+g <- g + edges(c("A","C", "B","C")) # edge from A to C and "B" to "C"
+```
+
+## Deleting
+
+For deletion it's easiest to use edge and vertex selectors
+
+
+
+```r
+g <- g - V(g)["A"] # Remove edge A
+```
+
+Note this will remove all attached edges. All edge and vertex subsetting can be used here.
+
+## Exercise - Subgraphs
+
+1. Find the edges in the USairports network that have a Distance>1500.
+2. Use the edge indices to create the long haul (> 1500 miles) flights network.
+3. How many airports can you get to from Oakland (OAK) with a single stop?
+
+-->
+<!-- ################################################################
+     ##                       Visualisation                        ##
+     ################################################################ -->
+</section>
+<section id="visualisation" class="slide level2">
+<h2>Visualisation</h2>
+</section>
+<section id="visualisation-in-r" class="slide level2">
+<h2>Visualisation in R</h2>
+<ul>
+<li><strong>igraph</strong>: large collection of layouts; base graphics</li>
+<li><strong>ggraph</strong>: leverages <strong>igraph</strong> for <strong>ggplot2</strong>-based graphics</li>
+<li>interactive JS visualisations: <strong>visNetwork</strong>, <strong>networkD3</strong>, <strong>threejs</strong></li>
+<li>…</li>
+</ul>
+</section>
+<section id="ggraph-package" class="slide level2">
+<h2><strong>ggraph</strong> Package</h2>
+<blockquote>
+<p><strong>ggraph</strong> is an extension to the <strong>ggplot2</strong> API to support relational data such as networks and trees.</p>
+</blockquote>
+<ul>
+<li>A <em>grammar of graphics</em> approach with geoms, aesthetics, etc <!-- --></li>
+<li>Ability to quickly exchange plot components</li>
+<li>Central components: layouts, nodes, edges</li>
+<li>Additional ggplot goodies: theme, facetting</li>
+</ul>
+<!-- ################################################################
+     ##                 ggraph: layout                             ##
+     ################################################################ -->
+</section>
+<section id="layout" class="slide level2">
+<h2>Layout</h2>
+<p>A layout is the specification on how nodes should be placed on a plane.</p>
+<!-- - e.g., strongly connected node in close proximity, or hive plots or treemaps -->
+<ul>
+<li>Spatial position of the nodes spans all layers of the plot, hence define outside of geoms or stats</li>
+<li><code>ggraph()</code> is the equivalent to <code>ggplot()</code> and <code>layout</code> is an argument to <code>ggraph()</code></li>
+</ul>
+</section>
+<section id="available-layouts" class="slide level2">
+<h2>Available Layouts</h2>
+<div style="float:left; width:40%">
+<h3 id="dendrogram-objects">Dendrogram objects</h3>
+<ul>
+<li><code>auto</code></li>
+<li><code>dendrogram</code></li>
+<li><code>even</code></li>
+</ul>
+</div>
+<div style="float:left; width:40%; margin-left:110px">
+<h3 id="igraph-objects">igraph objects</h3>
+<ul>
+<li><code>auto</code></li>
+<li><code>igraph</code></li>
+<li><code>dendrogram</code></li>
+<li><code>manual</code></li>
+<li><code>linear</code></li>
+<li><code>treemap</code></li>
+<li><code>circlepack</code></li>
+<li><code>partition</code></li>
+<li><code>hive</code></li>
+</ul>
+</div>
+</section>
+<section id="default-layout" class="slide level2">
+<h2>Default Layout</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggraph</span>(dolphin) <span class="op">+</span><span class="st"> </span><span class="kw">geom_node_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_edge_link</span>()</code></pre></div>
+<pre><code>## Using `nicely` as default layout</code></pre>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-30-1.png" width="768" height="370" /></p>
+</section>
+<section id="layout-1" class="slide level2">
+<h2>Layout</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># specify igraph algorithm directly</span>
+<span class="kw">ggraph</span>(dolphin, <span class="dt">layout =</span> <span class="st">&quot;kk&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_node_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_edge_link</span>()</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-31-1.png" width="768" height="370" /></p>
+<!-- circle through all 13 'hairball'/node-edge layouts available through **igraph** -->
+<!--
+## Layout
+
+
+```r
+library(tweenr)
+igraph_layouts <- c('star', 'circle', 'gem', 'dh', 'graphopt', 'grid', 'mds', 
+                    'randomly', 'fr', 'kk', 'drl', 'lgl')
+igraph_layouts <- sample(igraph_layouts)
+graph <- graph_from_data_frame(highschool)
+V(graph)$degree <- degree(graph)
+layouts <- lapply(igraph_layouts, create_layout, graph = graph)
+layouts_tween <- tween_states(c(layouts, layouts[1]), tweenlength = 1, 
+                              statelength = 1, ease = 'cubic-in-out', 
+                              nframes = length(igraph_layouts) * 16 + 8)
+title_transp <- tween_t(c(0, 1, 0, 0, 0), 16, 'cubic-in-out')[[1]]
+for (i in seq_len(length(igraph_layouts) * 16)) {
+    tmp_layout <- layouts_tween[layouts_tween$.frame == i, ]
+    layout <- igraph_layouts[ceiling(i / 16)]
+    title_alpha <- title_transp[i %% 16]
+    p <- ggraph(graph, 'manual', node.position = tmp_layout) + 
+        geom_edge_fan(aes(alpha = ..index.., colour = factor(year)), n = 15) +
+        geom_node_point(aes(size = degree)) + 
+        scale_edge_color_brewer(palette = 'Dark2') + 
+        ggtitle(paste0('Layout: ', layout)) + 
+        theme_void() + 
+        theme(legend.position = 'none', 
+              plot.title = element_text(colour = alpha('black', title_alpha)))
+    plot(p)
+}
+```
+-->
+</section>
+<section id="layouts" class="slide level2">
+<h2>Layouts</h2>
+<!-- circle through all 13 'hairball'/node-edge layouts available through **igraph** -->
+<center>
+<img src="ggraph_layout_animation.gif" width="500" height="400" align="middle"/>
+</center>
+<!-- ################################################################
+     ##                 ggraph: nodes                             ##
+     ################################################################ -->
+</section>
+<section id="nodes" class="slide level2">
+<h2>Nodes</h2>
+<p>The layout specifies <em>where</em> nodes are drawn, now we specify <em>how</em> they are drawn.</p>
+<p>The layout methods return a data frame with coordinates, so regular <strong>ggplot2</strong> geoms work.</p>
+</section>
+<section id="nodes-1" class="slide level2">
+<h2>Nodes</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggraph</span>(dolphin, <span class="dt">layout =</span> <span class="st">&#39;kk&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y))</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-33-1.png" width="768" height="430" /></p>
+</section>
+<section id="nodes-2" class="slide level2">
+<h2>Nodes</h2>
+<p><strong>ggraph</strong> provides various <code>geom_node_*()</code></p>
+<table>
+<thead>
+<tr class="header">
+<th><strong>ggraph</strong></th>
+<th>corresponds to</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>geom_node_point()</code></td>
+<td><code>geom_point()</code></td>
+</tr>
+<tr class="even">
+<td><code>geom_node_text()</code></td>
+<td><code>geom_text()</code></td>
+</tr>
+<tr class="odd">
+<td><code>geom_node_label()</code></td>
+<td><code>geom_label()</code></td>
+</tr>
+<tr class="even">
+<td><code>geom_node_tile()</code></td>
+<td><code>geom_tile()</code></td>
+</tr>
+<tr class="odd">
+<td><code>geom_node_circle()</code></td>
+<td><code>ggforce::geom_circle()</code></td>
+</tr>
+<tr class="even">
+<td><code>geom_node_arc_bar()</code></td>
+<td><code>ggforce::geom_arc_bar()</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="nodes-3" class="slide level2">
+<h2>Nodes</h2>
+<p>Why use <strong>ggraph</strong>’s family of <code>geom_node_*()</code> functions?</p>
+<ul>
+<li>readability: clear that this layer adds the nodes</li>
+<li>saves typing: defaults play nicely with the layout data frame</li>
+<li>extra functionality: filter aesthetic</li>
+</ul>
+</section>
+<section id="nodes-4" class="slide level2">
+<h2>Nodes</h2>
+<p>Illustration of filter aesthetic</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gr &lt;-<span class="st"> </span><span class="kw">graph_from_data_frame</span>(flare<span class="op">$</span>edges, 
+                            <span class="dt">vertices =</span> flare<span class="op">$</span>vertices)
+p &lt;-<span class="st"> </span><span class="kw">ggraph</span>(gr, <span class="dt">layout =</span> <span class="st">&#39;dendrogram&#39;</span>, <span class="dt">circular =</span> <span class="ot">TRUE</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_edge_diagonal</span>() <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">coord_fixed</span>()</code></pre></div>
+</section>
+<section id="nodes-5" class="slide level2">
+<h2>Nodes</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p <span class="op">+</span><span class="st"> </span><span class="kw">geom_node_point</span>()</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-35-1.png" width="731" height="430" /></p>
+</section>
+<section id="nodes-6" class="slide level2">
+<h2>Nodes</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p <span class="op">+</span><span class="st"> </span><span class="kw">geom_node_point</span>(<span class="kw">aes</span>(<span class="dt">filter =</span> leaf)) </code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-36-1.png" width="731" height="430" /></p>
+<!-- ################################################################
+     ##                 ggraph: edges                              ##
+     ################################################################ -->
+</section>
+<section id="edges" class="slide level2">
+<h2>Edges</h2>
+<p>An edge is an abstract concept denoting a relationship between two entities.</p>
+<p>Most often drawn as a (straight) line between nodes but sometimes also represented by, e.g., position.</p>
+<p>Family of <code>geom_edge_*()</code> functions available: some for all layouts, some only for specific layouts.</p>
+</section>
+<section id="iris-example" class="slide level2">
+<h2>Iris Example</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hierarchy &lt;-<span class="st"> </span><span class="kw">as.dendrogram</span>(<span class="kw">hclust</span>(<span class="kw">dist</span>(iris[, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>])))
+
+<span class="co"># Classify nodes based on agreement between children</span>
+hierarchy &lt;-<span class="st"> </span><span class="kw">tree_apply</span>(hierarchy, <span class="cf">function</span>(node, children, ...) {
+    <span class="cf">if</span> (<span class="kw">is.leaf</span>(node)) {
+        <span class="kw">attr</span>(node, <span class="st">&#39;Class&#39;</span>) &lt;-<span class="st"> </span><span class="kw">as.character</span>(
+          iris[<span class="kw">as.integer</span>(<span class="kw">attr</span>(node, <span class="st">&#39;label&#39;</span>)),<span class="dv">5</span>])
+    } <span class="cf">else</span> {
+        classes &lt;-<span class="st"> </span><span class="kw">unique</span>(<span class="kw">sapply</span>(children, attr, <span class="dt">which =</span> <span class="st">&#39;Class&#39;</span>))
+        <span class="cf">if</span> (<span class="kw">length</span>(classes) <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">anyNA</span>(classes)) {
+            <span class="kw">attr</span>(node, <span class="st">&#39;Class&#39;</span>) &lt;-<span class="st"> </span>classes
+        } <span class="cf">else</span> {
+            <span class="kw">attr</span>(node, <span class="st">&#39;Class&#39;</span>) &lt;-<span class="st"> </span><span class="ot">NA</span>
+        }
+    }
+    <span class="kw">attr</span>(node, <span class="st">&#39;nodePar&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">class =</span> <span class="kw">attr</span>(node, <span class="st">&#39;Class&#39;</span>))
+    node
+}, <span class="dt">direction =</span> <span class="st">&#39;up&#39;</span>)</code></pre></div>
+</section>
+<section id="highschool-example" class="slide level2">
+<h2>Highschool Example</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hairball &lt;-<span class="st"> </span><span class="kw">graph_from_data_frame</span>(highschool)
+
+<span class="co"># Classify nodes based on popularity gain</span>
+pop1957 &lt;-<span class="st"> </span><span class="kw">degree</span>(<span class="kw">delete_edges</span>(hairball, 
+                               <span class="kw">which</span>(<span class="kw">E</span>(hairball)<span class="op">$</span>year <span class="op">==</span><span class="st"> </span><span class="dv">1958</span>)), 
+                  <span class="dt">mode =</span> <span class="st">&#39;in&#39;</span>)
+pop1958 &lt;-<span class="st"> </span><span class="kw">degree</span>(<span class="kw">delete_edges</span>(hairball, 
+                               <span class="kw">which</span>(<span class="kw">E</span>(hairball)<span class="op">$</span>year <span class="op">==</span><span class="st"> </span><span class="dv">1957</span>)), 
+                  <span class="dt">mode =</span> <span class="st">&#39;in&#39;</span>)
+<span class="kw">V</span>(hairball)<span class="op">$</span>pop_devel &lt;-<span class="st"> </span><span class="kw">ifelse</span>(pop1957 <span class="op">&lt;</span><span class="st"> </span>pop1958, <span class="st">&#39;increased&#39;</span>,
+                                <span class="kw">ifelse</span>(pop1957 <span class="op">&gt;</span><span class="st"> </span>pop1958, <span class="st">&#39;decreased&#39;</span>, 
+                                       <span class="st">&#39;unchanged&#39;</span>))
+<span class="kw">V</span>(hairball)<span class="op">$</span>popularity &lt;-<span class="st"> </span><span class="kw">pmax</span>(pop1957, pop1958)
+<span class="kw">E</span>(hairball)<span class="op">$</span>year &lt;-<span class="st"> </span><span class="kw">as.character</span>(<span class="kw">E</span>(hairball)<span class="op">$</span>year)</code></pre></div>
+</section>
+<section id="link" class="slide level2">
+<h2>Link</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggraph</span>(hairball, <span class="dt">layout =</span> <span class="st">&#39;kk&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_edge_link</span>(<span class="kw">aes</span>(<span class="dt">colour =</span> year))</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-39-1.png" width="768" height="430" /></p>
+</section>
+<section id="fan" class="slide level2">
+<h2>Fan</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggraph</span>(hairball, <span class="dt">layout =</span> <span class="st">&#39;kk&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_edge_fan</span>(<span class="kw">aes</span>(<span class="dt">colour =</span> year))</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-40-1.png" width="768" height="430" /></p>
+</section>
+<section id="loops" class="slide level2">
+<h2>Loops</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">loopy_hairball &lt;-<span class="st"> </span><span class="kw">add_edges</span>(hairball, <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dt">each =</span> <span class="dv">2</span>), 
+                            <span class="dt">year =</span> <span class="kw">rep</span>(<span class="st">&#39;1957&#39;</span>, <span class="dv">5</span>))
+<span class="kw">ggraph</span>(loopy_hairball, <span class="dt">layout =</span> <span class="st">&#39;kk&#39;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_edge_link</span>(<span class="kw">aes</span>(<span class="dt">colour =</span> year), <span class="dt">alpha =</span> <span class="fl">0.25</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_edge_loop</span>(<span class="kw">aes</span>(<span class="dt">colour =</span> year))</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-41-1.png" width="768" height="337" /></p>
+</section>
+<section id="density" class="slide level2">
+<h2>Density</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggraph</span>(hairball, <span class="dt">layout =</span> <span class="st">&#39;kk&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_edge_link</span>(<span class="dt">alpha =</span> <span class="fl">0.25</span>) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_edge_density</span>(<span class="kw">aes</span>(<span class="dt">fill =</span> year))</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-42-1.png" width="768" height="409" /></p>
+</section>
+<section id="arcs" class="slide level2">
+<h2>Arcs</h2>
+<!-- While some insists that curved edges should be used in standard “hairball” graph visualisations it really is a poor choice, as it increases overplotting and interpretability for virtually no gain (unless complexiness is your thing). That doesn’t mean arcs have no use in graph visualizations. Linear and circular layouts can benefit greatly from them and geom_edge_arc() is provided precisely for this scenario:-->
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggraph</span>(hairball, <span class="dt">layout =</span> <span class="st">&#39;linear&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_edge_arc</span>(<span class="kw">aes</span>(<span class="dt">colour =</span> year))</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-43-1.png" width="768" height="430" /></p>
+</section>
+<section id="arcs-1" class="slide level2">
+<h2>Arcs</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggraph</span>(hairball, <span class="dt">layout =</span> <span class="st">&#39;linear&#39;</span>, <span class="dt">circular =</span> <span class="ot">TRUE</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">geom_edge_arc</span>(<span class="kw">aes</span>(<span class="dt">colour =</span> year)) <span class="op">+</span><span class="st"> </span><span class="kw">coord_fixed</span>()</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-44-1.png" width="768" height="409" /></p>
+</section>
+<section id="elbow" class="slide level2">
+<h2>Elbow</h2>
+<!-- Does this geom work with other layouts? Or is this one of the geom specific to a layout? -->
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggraph</span>(hierarchy, <span class="dt">layout =</span> <span class="st">&#39;dendrogram&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_edge_elbow</span>()</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-45-1.png" width="768" height="430" /></p>
+</section>
+<section id="diagonals" class="slide level2">
+<h2>Diagonals</h2>
+<!-- If right angles aren’t really your thing ggraph provides a smoother version in the form of geom_edge_diagonal(). This edge is a quadratic bezier with control points positioned at the same x-value as the terminal nodes and halfway in-between the nodes on the y-axis. The result is more organic than the elbows: -->
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggraph</span>(hierarchy, <span class="dt">layout =</span> <span class="st">&#39;dendrogram&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_edge_diagonal</span>()</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-46-1.png" width="768" height="430" /></p>
+<!-- 
+## Hive
+
+FIXME: include?
+
+This is certainly a very specific type of edge, intended only for use with hive plots. It draws edges as quadratic beziers with control point positioned perpendicular to the axes of the hive layout: 
+
+
+```r
+ggraph(hairball, layout = 'hive', axis = 'pop_devel', sort.by = 'popularity') + 
+    geom_edge_hive(aes(colour = year)) + 
+    geom_axis_hive() + 
+    coord_fixed()
+```
+
+<img src="networks_files/figure-revealjs/unnamed-chunk-47-1.png" width="768" />
+-->
+</section>
+<section id="three-types-of-edge-geoms" class="slide level2">
+<h2>Three Types of Edge Geoms</h2>
+<ul>
+<li>base variant, e.g., <code>geom_edge_link()</code></li>
+<li>suffix <code>2</code>, e.g., <code>geom_edge_link2()</code></li>
+<li>suffix <code>0</code>, e.g., <code>geom_edge_link0()</code></li>
+</ul>
+</section>
+<section id="base-variant" class="slide level2">
+<h2>Base Variant</h2>
+<ul>
+<li>Drawn by calculating a number of points along the edge path and draw a line between these</li>
+<li>Control the level of detail for curved edges</li>
+<li>Can be used for a gradient along the edge</li>
+</ul>
+<!-- The basic edge geom is drawn by calculating a number of points along the edge path and draw a line between these. This means that you’re in control of the detail level of curved edges and that all complex calculations happens up front.
+
+The possibility of drawing a gradient along the edge. Each calculated point gets an index value between 0 and 1 that specifies how far along the edge it is positioned and this value can be used to e.g. map to an alpha level to show the direction of the edge -->
+</section>
+<section id="base-variant-1" class="slide level2">
+<h2>Base Variant</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggraph</span>(hairball, <span class="dt">layout =</span> <span class="st">&#39;linear&#39;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">geom_edge_arc</span>(<span class="kw">aes</span>(<span class="dt">colour =</span> year, <span class="dt">alpha =</span> ..index..)) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">scale_edge_alpha</span>(<span class="st">&#39;Edge direction&#39;</span>, <span class="dt">guide =</span> <span class="st">&#39;edge_direction&#39;</span>)</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-48-1.png" width="768" height="380" /></p>
+</section>
+<section id="variant" class="slide level2">
+<h2>2-Variant</h2>
+<ul>
+<li>Similar to base variant</li>
+<li>Difference: possible to map node attributes to the edge, aesthetics are then interpolated along the edge</li>
+</ul>
+<!--
+Like the base variant the 2-variant calculates points along the edge and draws a path along them. The difference here is that in this variant you can map node attributes to the edge and the aesthetics are then interpolated along the edge. This is easier to show than to explain:
+-->
+</section>
+<section id="variant-1" class="slide level2">
+<h2>2-Variant</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggraph</span>(hierarchy, <span class="dt">layout =</span> <span class="st">&#39;dendrogram&#39;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">geom_edge_elbow2</span>(<span class="kw">aes</span>(<span class="dt">colour =</span> node.class))</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-49-1.png" width="768" height="409" /></p>
+</section>
+<section id="variant-2" class="slide level2">
+<h2>0-variant</h2>
+<ul>
+<li>“tack sharp resolution in the curves”</li>
+<li>no gradients along the edge</li>
+</ul>
+<!--
+This is, sadly, the boring one at the end. You don’t get the luxury of smooth gradients over the edge and often you have a considerably worse performance. What you gain though is tack sharp resolution in the curves so if this is of utmost importance you are covered by this variant.
+-->
+</section>
+<section id="decorating-edges" class="slide level2">
+<h2>Decorating Edges</h2>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-50-1.png" width="768" /></p>
+</section>
+<section id="theme" class="slide level2">
+<h2>Theme</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">graph &lt;-<span class="st"> </span><span class="kw">graph_from_data_frame</span>(highschool)
+(p &lt;-<span class="st"> </span><span class="kw">ggraph</span>(graph, <span class="dt">layout =</span> <span class="st">&#39;kk&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_edge_link</span>(
+  <span class="kw">aes</span>(<span class="dt">colour =</span> <span class="kw">factor</span>(year))) <span class="op">+</span><span class="st"> </span><span class="kw">geom_node_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&#39;An example&#39;</span>))</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-51-1.png" width="768" height="380" /></p>
+</section>
+<section id="theme-1" class="slide level2">
+<h2>Theme</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p <span class="op">+</span><span class="st"> </span><span class="kw">theme_graph</span>()</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-52-1.png" width="768" height="430" /></p>
+</section>
+<section id="theme-2" class="slide level2">
+<h2>Theme</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p <span class="op">+</span><span class="st"> </span><span class="kw">theme_graph</span>(<span class="dt">background =</span> <span class="st">&#39;grey20&#39;</span>, <span class="dt">text_colour =</span> <span class="st">&#39;white&#39;</span>)</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-53-1.png" width="768" height="430" /></p>
+</section>
+<section id="facetting" class="slide level2">
+<h2>Facetting</h2>
+<ul>
+<li>Easy facetting is one of the great advantages of ggplot2</li>
+<li>Concept of plotting small multiples is useful also for graphs, e.g., to avoid hairballs and overplotting</li>
+<li><strong>ggraph</strong> has its own facetting functions: <code>facet_nodes()</code>, <code>facet_edges()</code> and <code>facet_graph()</code></li>
+</ul>
+</section>
+<section id="facet-example" class="slide level2">
+<h2>Facet Example</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Assign each node to a random class</span>
+<span class="kw">V</span>(graph)<span class="op">$</span>class &lt;-<span class="st"> </span><span class="kw">sample</span>(letters[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>], <span class="kw">gorder</span>(graph), <span class="ot">TRUE</span>)
+<span class="co"># Make year a character</span>
+<span class="kw">E</span>(graph)<span class="op">$</span>year &lt;-<span class="st"> </span><span class="kw">as.character</span>(<span class="kw">E</span>(graph)<span class="op">$</span>year)
+
+p &lt;-<span class="st"> </span><span class="kw">ggraph</span>(graph, <span class="dt">layout =</span> <span class="st">&#39;kk&#39;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">geom_edge_fan</span>(<span class="kw">aes</span>(<span class="dt">alpha =</span> ..index.., <span class="dt">colour =</span> year)) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">geom_node_point</span>(<span class="kw">aes</span>(<span class="dt">shape =</span> class)) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">scale_edge_alpha</span>(<span class="dt">guide =</span> <span class="st">&#39;none&#39;</span>)</code></pre></div>
+</section>
+<section id="facetting-edges" class="slide level2">
+<h2>Facetting Edges</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p <span class="op">+</span><span class="st"> </span><span class="kw">facet_edges</span>(<span class="op">~</span>year)</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-55-1.png" width="768" height="430" /></p>
+</section>
+<section id="facetting-nodes" class="slide level2">
+<h2>Facetting Nodes</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p <span class="op">+</span><span class="st"> </span><span class="kw">facet_nodes</span>(<span class="op">~</span>class)</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-56-1.png" width="768" height="430" /></p>
+</section>
+<section id="facetting-nodes-and-edges" class="slide level2">
+<h2>Facetting Nodes and Edges</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p <span class="op">+</span><span class="st"> </span><span class="kw">facet_graph</span>(year <span class="op">~</span><span class="st"> </span>class)</code></pre></div>
+<p><img src="networks_files/figure-revealjs/unnamed-chunk-57-1.png" width="768" height="430" /></p>
+<!-- ################################################################
+     ##                   The end                                  ##
+     ################################################################ -->
+</section>
+<section id="what-next" class="slide level2">
+<h2>What next?</h2>
+<ul>
+<li>Stay around for the evening event!</li>
+<li>Full course on network analysis including a statistical approach. Contact <a href="mailto:training@mango-solutions.com">training@mango-solutions.com</a>.</li>
+<li>Other courses: Introduction to R, shiny apps, package development, visualisation, python and more.</li>
+<li>EARL conference:
+<ul>
+<li>London: September 11-13</li>
+<li>US Roadshow (Seattle, Houston, Boston): November 7/9/13</li>
+</ul></li>
+</ul>
+</section>
+
+  <!--
+  To hide progress bar from entire presentation
+  just remove “progress” element.
+  -->
+  <!-- <div class="progress"></div> -->
+  <script src="networks_files/rmdshower/node_modules/shower/node_modules/shower-core/shower.min.js"></script>
+  <!-- Copyright © 2015 Yours Truly, Famous Inc. -->
+  <!-- Photos by John Carey, fiftyfootshadows.net -->
+
+    <script>renderMathInElement(document.body);</script>
+  
+  
+</body>
+</html>
